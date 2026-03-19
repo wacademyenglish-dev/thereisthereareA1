@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WOLF LABS | Main Series: Chicago Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-spotify: #121212;
+            --bg-card: #181818;
+            --bg-hover: #282828;
+            --spotify-green: #1DB954;
+            --text-main: #FFFFFF;
+            --text-sub: #B3B3B3;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-spotify);
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Premium Components */
+        .glass-card { 
+            background: var(--bg-card); 
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-premium {
+            background-color: var(--spotify-green);
+            color: #000;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            border-radius: 9999px;
+        }
+        .btn-premium:hover {
+            transform: scale(1.02);
+            background-color: #1ed760;
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.4);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--text-sub);
+            color: var(--text-main);
+            transition: all 0.2s;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .btn-ghost:hover {
+            border-color: var(--spotify-green);
+            color: var(--spotify-green);
+        }
+
+        .option-btn {
+            background: #242424;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            color: var(--text-main);
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+        .option-btn:active { transform: scale(0.98); }
+        .correct { background: var(--spotify-green) !important; color: #000 !important; border-color: var(--spotify-green) !important; }
+        .wrong { background: #E91429 !important; border-color: #E91429 !important; }
+
+        /* UI Elements */
+        .progress-track { background: var(--bg-hover); height: 4px; border-radius: 2px; overflow: hidden; }
+        .progress-fill { background: var(--spotify-green); height: 100%; transition: width 0.4s ease; }
+        
+        .speaking-bubble {
+            background: var(--bg-card);
+            border-left: 4px solid var(--spotify-green);
+            position: relative;
+        }
+
+        /* Drawers */
+        .drawer {
+            background: var(--bg-spotify);
+            border-left: 1px solid var(--bg-hover);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        }
+        .nav-item { border-left: 2px solid transparent; transition: all 0.2s; }
+        .nav-item.active { border-left-color: var(--spotify-green); background: var(--bg-hover); color: var(--spotify-green); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-spotify); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 3px; }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden">
+
+    <!-- TOP NAVIGATION -->
+    <nav class="shrink-0 bg-[#000000] border-b border-[#282828] px-6 py-4 flex justify-between items-center z-40">
+        <div class="flex items-center gap-3">
+            <div class="bg-[#1DB954] p-2 rounded text-black">
+                <i class="fas fa-city"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-black text-xl tracking-tighter leading-none">WOLF<span class="text-[#1DB954]">LABS</span></span>
+                <span class="text-[9px] uppercase tracking-widest text-[#b3b3b3] font-bold">Main Series</span>
+            </div>
+        </div>
+        
+        <div id="nav-info" class="hidden md:flex flex-col items-center gap-2 flex-grow max-w-md mx-8">
+            <div class="flex justify-between w-full text-[10px] font-bold uppercase tracking-widest">
+                <span class="text-[#1DB954]">A1 • THERE IS / THERE ARE</span>
+                <span id="step-indicator" class="text-[#b3b3b3]">PAGE 1 / 30</span>
+            </div>
+            <div class="w-full progress-track">
+                <div id="progress-bar" class="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button onclick="toggleLessonNavigator()" class="lesson-map-btn hidden px-4 py-2 rounded-full bg-[#181818] border border-[#282828] text-[#b3b3b3] hover:text-[#1DB954] hover:border-[#1DB954] transition-all flex items-center gap-2 font-bold text-xs">
+                <i class="fas fa-map"></i> <span class="hidden lg:inline">Lesson Map</span>
+            </button>
+            <button onclick="toggleFullScreen()" class="w-10 h-10 rounded-full bg-[#181818] text-[#b3b3b3] hover:text-white hover:bg-[#282828] transition-all flex items-center justify-center">
+                <i class="fas fa-expand"></i>
+            </button>
+            <button onclick="toggleWhiteboard()" class="px-4 py-2 rounded-full bg-[#1DB954] text-black hover:bg-[#1ed760] transition-all flex items-center gap-2 font-bold text-xs">
+                <i class="fas fa-pen-nib"></i> <span class="hidden sm:inline">Board</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- MAIN DASHBOARD -->
+    <main id="dashboard" class="flex-grow flex flex-col items-center justify-center p-6 overflow-y-auto">
+        <div class="text-center space-y-4 mb-12 animate-in fade-in">
+            <p class="text-sm text-[#1DB954] font-black tracking-[0.3em] uppercase mb-4">Interactive System Module</p>
+            <h1 class="text-6xl font-black tracking-tighter uppercase">The Chicago <span class="text-[#1DB954]">Experience</span></h1>
+            <p class="text-[#b3b3b3] max-w-xl mx-auto mt-6 text-lg font-medium">A Premium Main Series lesson on daily life, neighborhoods, and spatial descriptions.</p>
+        </div>
+
+        <button onclick="startLesson()" class="btn-premium px-12 py-5 text-xl flex items-center gap-4 shadow-xl">
+            Launch Class <i class="fas fa-play"></i>
+        </button>
+    </main>
+
+    <!-- LESSON ARENA -->
+    <main id="lesson-arena" class="hidden flex-grow flex flex-col overflow-hidden relative">
+        <div id="lesson-content" class="flex-grow overflow-y-auto p-6 md:p-12 flex items-center justify-center">
+            <!-- Content Injected via JS -->
+        </div>
+
+        <div class="shrink-0 bg-[#000000] border-t border-[#282828] p-6 flex justify-between items-center z-30">
+            <button onclick="prevStep()" class="btn-ghost px-6 py-3 text-xs flex items-center gap-3">
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <div id="teacher-hint" class="hidden md:block absolute left-1/2 transform -translate-x-1/2 bottom-8 text-[10px] uppercase tracking-widest text-[#1DB954] font-bold bg-[#181818] px-4 py-2 rounded-full border border-[#282828] shadow-2xl"></div>
+            <button onclick="nextStep()" id="next-btn" class="btn-premium px-8 py-3 flex items-center gap-3 text-xs">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- LESSON NAVIGATOR -->
+    <aside id="lesson-navigator" class="fixed right-0 top-[73px] h-[calc(100vh-73px)] w-80 drawer z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-[#282828] flex justify-between items-center bg-[#121212]">
+            <div>
+                <h2 class="font-black text-sm tracking-widest text-[#1DB954] uppercase">Lesson Map</h2>
+                <p class="text-[9px] text-[#b3b3b3] uppercase tracking-widest mt-1">Quick navigation</p>
+            </div>
+            <button onclick="toggleLessonNavigator()" class="text-[#b3b3b3] hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="nav-steps-list" class="flex-grow overflow-y-auto p-4 space-y-1"></div>
+    </aside>
+
+    <!-- TEACHER BOARD -->
+    <aside id="whiteboard" class="fixed right-0 top-[73px] h-[calc(100vh-73px)] w-96 drawer z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-6 border-b border-[#282828] flex justify-between items-center bg-[#121212]">
+            <div>
+                <h2 class="font-black text-lg tracking-tight flex items-center gap-2"><i class="fas fa-chalkboard text-[#1DB954]"></i> BOARD</h2>
+                <p class="text-[10px] text-[#b3b3b3] uppercase tracking-widest mt-1">Live notes</p>
+            </div>
+            <button onclick="toggleWhiteboard()" class="w-8 h-8 rounded-full bg-[#282828] hover:bg-[#3e3e3e] flex items-center justify-center transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4 bg-[#0a0a0a] flex flex-wrap gap-2 border-b border-[#282828]">
+            <button onclick="insertTag('[GRAMMAR]')" class="text-[9px] font-bold bg-[#181818] border border-[#333] px-3 py-1.5 rounded hover:text-[#1DB954]">Grammar</button>
+            <button onclick="insertTag('[VOCAB]')" class="text-[9px] font-bold bg-[#181818] border border-[#333] px-3 py-1.5 rounded hover:text-[#1DB954]">Vocab</button>
+            <button onclick="insertTag('[CORRECTION]')" class="text-[9px] font-bold bg-[#181818] border border-[#333] px-3 py-1.5 rounded hover:text-[#ef4444]">Correction</button>
+        </div>
+        <textarea id="wb-text" class="flex-grow bg-[#121212] text-white p-6 resize-none focus:outline-none focus:ring-1 focus:ring-[#1DB954] font-mono text-sm leading-relaxed" placeholder="Type corrections here..."></textarea>
+        <div class="p-4 border-t border-[#282828] bg-[#0a0a0a]">
+            <button onclick="document.getElementById('wb-text').value=''" class="w-full py-2 text-[10px] font-bold text-[#b3b3b3] hover:text-white uppercase tracking-widest border border-[#333] rounded hover:bg-[#181818]">Clear Board</button>
+        </div>
+    </aside>
+
+    <!-- FOOTER -->
+    <footer class="shrink-0 bg-[#000000] border-t border-[#282828] py-2 text-center text-[9px] text-[#555] font-black uppercase tracking-[0.3em] z-50">
+        WOLF LABS | PREMIUM SERIES | CHICAGO EXPERIENCE A1
+    </footer>
+
+    <script>
+        // --- UTILS ---
+        const esc = (s) => s.replace(/'/g, "\\'");
+
+        // --- STEP CONSTRUCTORS ---
+        const TYPES = { GUIDE: "TEACHER GUIDE", COVER: "COVER", WARMUP: "WARMUP", VOCAB: "VOCABULARY", VIDEO: "VIDEO INPUT", SCRIPT: "SCRIPT ANALYSIS", GRAMMAR: "GRAMMAR", DRILL: "INTERACTIVE DRILL", SPEAKING: "SPEAKING ARENA", WRAP: "WRAP-UP" };
+
+        function step(type, title, html, teacherHint = "Facilitate discussion.") { return { type, title, html, teacherHint }; }
+
+        const bGuide = (title, focus, points) => step(TYPES.GUIDE, title, `
+            <div class="max-w-3xl mx-auto space-y-8 w-full">
+                <div class="p-8 bg-[#181818] rounded-2xl border border-[#282828] shadow-2xl">
+                    <h2 class="text-3xl font-black text-[#1DB954] mb-4">${focus}</h2>
+                    <ul class="space-y-4 text-lg text-[#b3b3b3]">
+                        ${points.map(p => `<li><i class="fas fa-check-circle text-[#1DB954] mr-3"></i>${p}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="p-6 bg-[#0a0a0a] rounded-xl border border-dashed border-[#1DB954] text-sm text-white">
+                    <i class="fas fa-mouse-pointer text-[#1DB954] mr-2"></i> <strong>Pro Tip:</strong> In Zoom or Google Meet, you can grant <strong>mouse control</strong> to your student so they can interact directly with the buttons, quizzes, and scripts! This increases engagement by 100%.
+                </div>
+            </div>
+        `, "Review targets before starting.");
+
+        const bCover = (title, subtitle) => step(TYPES.COVER, title, `
+            <div class="text-center space-y-6 w-full">
+                <div class="inline-block w-24 h-24 bg-[#1DB954] text-black rounded-3xl flex items-center justify-center font-black text-4xl mb-6 shadow-[0_0_30px_rgba(29,185,84,0.3)]"><i class="fas fa-building"></i></div>
+                <h1 class="text-6xl font-black tracking-tighter uppercase">${title}</h1>
+                <p class="text-2xl text-[#b3b3b3] uppercase tracking-widest font-bold">${subtitle}</p>
+            </div>
+        `, "Welcome the student warmly. Build rapport.");
+
+        const bWarmup = (title, emoji, prompt, starter) => step(TYPES.WARMUP, title, `
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-12 items-center w-full">
+                <div class="text-[150px] drop-shadow-2xl">${emoji}</div>
+                <div class="space-y-8 flex-grow w-full">
+                    <h2 class="text-4xl font-black">${prompt}</h2>
+                    <div class="speaking-bubble p-8 rounded-2xl">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-[#1DB954] mb-3">Speaking Starter</p>
+                        <p class="text-2xl font-medium text-white">"${starter}"</p>
+                    </div>
+                </div>
+            </div>
+        `, "Ask the question. Let the student use the starter.");
+
+        const bVocab = (word, emoji, definition, question, starter) => step(TYPES.VOCAB, word, `
+            <div class="max-w-4xl mx-auto flex flex-col md:flex-row gap-12 items-center w-full">
+                <div class="text-[120px] bg-[#181818] w-64 h-64 flex items-center justify-center rounded-3xl border border-white/5 shadow-xl">${emoji}</div>
+                <div class="space-y-8 flex-grow w-full">
+                    <div>
+                        <h2 class="text-5xl font-black uppercase tracking-tight text-[#1DB954] mb-2">${word}</h2>
+                        <p class="text-2xl font-light italic text-[#b3b3b3]">${definition}</p>
+                    </div>
+                    <div class="p-6 bg-[#0a0a0a] border-l-4 border-[#1DB954] rounded-r-xl">
+                        <p class="font-bold text-xl mb-4">${question}</p>
+                        <p class="text-sm font-black uppercase tracking-widest text-[#555] mb-1">Answer Starter:</p>
+                        <p class="text-lg text-[#1DB954]">"${starter}"</p>
+                    </div>
+                </div>
+            </div>
+        `, "Check pronunciation. Ask follow-up immediately.");
+
+        const bVideo = (videoId) => step(TYPES.VIDEO, "The Chicago Experience", `
+            <div class="max-w-4xl mx-auto w-full space-y-6">
+                <h2 class="text-3xl font-black text-center">Watch the Video</h2>
+                <p class="text-[#b3b3b3] text-center mb-8 italic">Listen to Joe describe his neighborhood in Chicago.</p>
+                <div class="video-container">
+                    <iframe src="https://www.youtube.com/embed/${videoId}?rel=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        `, "Watch the video together. Remind student not to worry about 100% understanding.");
+
+        const bScript = (title, line, grammarReveal, meaningReveal, followup, starter) => {
+            const html = `
+                <div class="max-w-4xl mx-auto w-full space-y-8">
+                    <h2 class="text-xl font-bold text-[#b3b3b3] uppercase tracking-widest text-center mb-8">Script Analysis</h2>
+                    <div class="p-8 bg-[#181818] rounded-2xl border border-white/5" id="script-box-${title.replace(/\s+/g, '')}">
+                        <p class="text-3xl font-light leading-relaxed">"${line.replace(/\[(.*?)\]/g, (match, p1) => `<span class="text-[#1DB954] font-bold cursor-pointer border-b-2 border-dashed border-[#1DB954] hover:bg-[#1DB954]/10 transition-colors px-1" onclick="revealScript(this, '${esc(grammarReveal)}', '${esc(meaningReveal)}', '${esc(followup)}', '${esc(starter)}')">${p1}</span>`)}"</p>
+                        <p class="text-[10px] uppercase font-black text-[#555] mt-6"><i class="fas fa-mouse-pointer mr-2"></i>Click the green text to analyze</p>
+                    </div>
+                    
+                    <div id="reveal-content" class="hidden opacity-0 transition-opacity duration-500 space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-6 bg-[#0a0a0a] rounded-xl border border-[#333]">
+                                <p class="text-[10px] font-black uppercase text-[#1DB954] mb-2"><i class="fas fa-wrench mr-2"></i>Grammar Engine</p>
+                                <p class="text-lg" id="r-grammar"></p>
+                            </div>
+                            <div class="p-6 bg-[#0a0a0a] rounded-xl border border-[#333]">
+                                <p class="text-[10px] font-black uppercase text-yellow-500 mb-2"><i class="fas fa-lightbulb mr-2"></i>Meaning</p>
+                                <p class="text-lg" id="r-meaning"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="speaking-bubble p-6 rounded-xl">
+                            <p class="text-xl font-bold mb-3" id="r-followup"></p>
+                            <p class="text-[10px] font-black uppercase text-[#555] mb-1">Starter:</p>
+                            <p class="text-lg text-[#1DB954]" id="r-starter"></p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return step(TYPES.SCRIPT, title, html, "Grant mouse control for student interaction.");
+        };
+
+        const bGrammar = (title, rule, structures) => step(TYPES.GRAMMAR, title, `
+            <div class="max-w-4xl mx-auto space-y-8 w-full">
+                <div class="p-8 bg-gradient-to-br from-[#1DB954] to-[#127d36] text-black rounded-3xl shadow-2xl">
+                    <h2 class="text-4xl font-black mb-2">${rule.title}</h2>
+                    <p class="text-xl font-medium opacity-90">${rule.desc}</p>
+                </div>
+                <div class="space-y-4">
+                    ${structures.map(s => `
+                        <div class="p-6 bg-[#181818] border border-[#282828] rounded-xl flex items-center justify-between">
+                            <span class="text-2xl font-light">${s.ex.replace(/\[(.*?)\]/g, '<strong class="text-[#1DB954] font-black">$1</strong>')}</span>
+                            <span class="px-4 py-1 bg-[#282828] rounded-full text-xs font-bold uppercase tracking-widest text-[#b3b3b3]">${s.label}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `, "Explain rule briefly. Ask for real-life example.");
+
+        const bQuizDrill = (id, instruction, prefix, suffix, options, correctIdx, followup, starter) => step(TYPES.DRILL, instruction, `
+            <div class="max-w-4xl mx-auto text-center space-y-10 w-full flex flex-col items-center">
+                <h2 class="text-xl font-bold text-[#b3b3b3] uppercase tracking-widest">${instruction}</h2>
+                <div class="text-4xl md:text-5xl font-light leading-tight w-full bg-[#181818] p-10 rounded-3xl border border-white/5 shadow-lg">
+                    ${prefix} <span id="quiz-blank-${id}" class="inline-block border-b-4 border-[#1DB954] min-w-[120px] text-[#1DB954] font-black text-center transition-all">&nbsp;</span> ${suffix}
+                </div>
+                <div class="flex justify-center gap-4 flex-wrap" id="quiz-options-${id}">
+                    ${options.map((opt, i) => `
+                        <button onclick="handleQuizDrill('${id}', this, ${i === correctIdx}, '${esc(opt)}', '${esc(followup)}', '${esc(starter)}')" class="option-btn px-8 py-4 text-xl">
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+                <div id="followup-box-${id}" class="hidden w-full mt-4 p-8 bg-[#0a0a0a] border-l-4 border-[#1DB954] rounded-r-2xl text-left animate-in fade-in">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#1DB954] mb-2"><i class="fas fa-comment-dots mr-2"></i>Now your turn</p>
+                    <p class="text-2xl font-bold mb-4 text-white">${followup}</p>
+                    <p class="text-lg text-[#b3b3b3]">"${starter}"</p>
+                </div>
+            </div>
+        `, "Let student choose. Follow up immediately after correct answer.");
+
+        const bSpeaking = (title, prompt, bullets, starter) => step(TYPES.SPEAKING, title, `
+            <div class="max-w-4xl mx-auto w-full h-full flex flex-col justify-center space-y-8">
+                <div class="border-4 border-[#181818] p-12 rounded-[3rem] relative bg-[#121212]">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-[#000] px-6 py-1 text-[#1DB954] font-black text-xl uppercase tracking-widest rounded-full border border-[#1DB954]">
+                        Speaking Arena
+                    </div>
+                    <h2 class="text-4xl font-black leading-tight mb-8 text-center mt-4">${prompt}</h2>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        ${bullets.map(b => `<span class="px-6 py-2 bg-[#181818] text-[#b3b3b3] rounded-full font-bold text-sm border border-[#282828]">${b}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="speaking-bubble p-6 rounded-2xl mx-auto max-w-2xl w-full text-center">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-[#1DB954] mb-2">Speaking Starter</p>
+                    <p class="text-xl font-medium text-white">"${starter}"</p>
+                </div>
+            </div>
+        `, "Silence. Let the student speak. Use board for delayed corrections.");
+
+        const bWrap = () => step(TYPES.WRAP, "Lesson Complete", `
+            <div class="text-center space-y-8 max-w-2xl mx-auto">
+                <div class="text-8xl text-[#1DB954] mb-8"><i class="fas fa-check-circle"></i></div>
+                <h1 class="text-6xl font-black uppercase tracking-tighter">Excellent Work</h1>
+                <p class="text-xl text-[#b3b3b3]">You mastered describing places and the use of 'There is / There are'.</p>
+                <div class="pt-8">
+                    <button onclick="goHome()" class="btn-premium px-12 py-4 text-sm shadow-[0_0_30px_rgba(29,185,84,0.3)]">Back to Dashboard</button>
+                </div>
+            </div>
+        `, "Positive feedback. Offer homework.");
+
+        // --- LESSON DATA GENERATION ---
+        const generateClassData = () => [
+            // TEACHER GUIDES FIRST
+            bGuide("Module Briefing 1/3", "Lesson Overview", [
+                "Product: MAIN SERIES (Daily Life)",
+                "Level: A1 (Beginner)",
+                "Topic: Neighborhoods & City Life",
+                "Grammar: There is / There are (Affirmative, Negative, Interrogative)",
+                "Duration: ~60 minutes"
+            ]),
+            bGuide("Module Briefing 2/3", "Interaction Strategy", [
+                "Target Student Talk Time (STT): 80%",
+                "Grant mouse control to student for interaction with quizzes and scripts.",
+                "Core Logic: Correct Answer -> Green Background -> Immediate Follow-up Question.",
+                "Don't skip Speaking Starters."
+            ]),
+            bGuide("Module Briefing 3/3", "Common A1 Errors", [
+                "Using 'There is' for plural (e.g., 'There is two cars').",
+                "Using 'Have' for existence (L1 interference).",
+                "Omitting articles (e.g., 'There is park' instead of 'There is A park').",
+                "Use Board (top right) for silent corrections."
+            ]),
+            
+            // COVER PAGE
+            bCover("The Chicago Experience", "My Neighborhood"),
+
+            // REST OF THE LESSON
+            bWarmup("Icebreaker", "🏙️", "Do you live in a big city or a small town?", "I live in a..."),
+            bWarmup("Your Area", "🏡", "What is near your house?", "Near my house, I have..."),
+            bWarmup("Preferences", "❤️", "Do you like your neighborhood? Why?", "Yes, I like it because..."),
+            bWarmup("Missing Things", "🤔", "What do you want in your city?", "In my city, I want a..."),
+            bVocab("Neighborhood", "🏘️", "An area or community where people live.", "Is your neighborhood quiet or noisy?", "My neighborhood is very..."),
+            bVocab("Restaurant", "🍽️", "A place to buy and eat meals.", "What is your favorite restaurant?", "My favorite restaurant is..."),
+            bVocab("Grocery Store", "🛒", "A store that sells food and household supplies.", "Who buys food in your house?", "In my house, ... buys the food."),
+            bVocab("Park", "🌳", "A large green public area.", "Do you go to the park on weekends?", "Yes, on weekends I go to..."),
+            bVideo("VoMFusMOWfM"),
+            bScript("Line 1", "Taylor Street [is filled with restaurants] and if you're hungry...", 
+                    "We use 'restaurants' in the plural with 'is filled with'.", 
+                    "It means there are MANY places to eat.", 
+                    "Are there many restaurants on your street?", 
+                    "Yes, there are many / No, there aren't any..."),
+            bScript("Line 2", "As far as shopping, [Costco, Target, grocery stores]... plenty of options.", 
+                    "Names of specific stores and general places for food.", 
+                    "You can buy everything you need nearby.", 
+                    "Is there a big supermarket near your house?", 
+                    "Yes, there is a big..."),
+            bScript("Line 3", "[there are three magnet elementary schools] here in the neighborhood...", 
+                    "We use 'THERE ARE' because 'schools' is plural.", 
+                    "The neighborhood is good for families with children.", 
+                    "How many schools are there near you?", 
+                    "Near my house, there are..."),
+            bGrammar("Grammar Engine", {title: "There is / There are", desc: "Used to say that something exists in a specific place."}, [
+                {ex: "[There is] a park.", label: "Singular (1)"},
+                {ex: "[There are] many restaurants.", label: "Plural (2+)"}
+            ]),
+            bGrammar("Affirmative (+)", {title: "Affirmative", desc: "Don't forget the article 'A/AN' for singular nouns."}, [
+                {ex: "[There is a] grocery store.", label: "One item"},
+                {ex: "[There are two] hospitals.", label: "Two items"},
+                {ex: "[There are many] trees.", label: "Many items"}
+            ]),
+            bGrammar("Negative (-)", {title: "Negative", desc: "Add 'NOT' (isn't / aren't). Use 'ANY' for plural."}, [
+                {ex: "[There isn't a] beach here.", label: "Singular"},
+                {ex: "[There aren't any] mountains.", label: "Plural"}
+            ]),
+            bGrammar("Interrogative (?)", {title: "Interrogative", desc: "Swap the words to make a question."}, [
+                {ex: "[Is there a] subway station?", label: "Singular Q"},
+                {ex: "[Are there any] good schools?", label: "Plural Q"}
+            ]),
+            bQuizDrill("d1", "Choose the correct word", "___", "a big supermarket near here.", ["There is", "There are", "They are"], 0, 
+                       "What is the name of the supermarket near you?", "The supermarket is called..."),
+            bQuizDrill("d2", "Choose the correct word", "___", "many restaurants on my street.", ["There is", "There are", "There aren't"], 1, 
+                       "What kind of food do they sell?", "They sell..."),
+            bQuizDrill("d3", "Make it Negative", "There", "a hospital in my neighborhood.", ["isn't", "aren't", "not is"], 0, 
+                       "Where is the nearest hospital?", "The nearest hospital is in..."),
+            bQuizDrill("d4", "Make it a Question", "___", "any parks near the school?", ["Is there", "Are there", "There are"], 1, 
+                       "Do you like going to parks?", "Yes, I like parks because..."),
+            bQuizDrill("d5", "Find the mistake", "There is", "two schools here.", ["a school", "two school", "schools"], 0, 
+                       "Is your school near your house?", "My school/work is..."),
+            bSpeaking("Reality Check", "Describe your neighborhood using 'There is' and 'There are'.", 
+                      ["Supermarket", "Park", "Restaurants", "Quiet/Noisy"], 
+                      "In my neighborhood, there is a... and there are..."),
+            bSpeaking("The Dilemma", "Would you prefer a neighborhood with many RESTAURANTS or many PARKS?", 
+                      ["Food", "Nature", "Noise", "Health"], 
+                      "I prefer many... because..."),
+            bSpeaking("Dream City", "Design your dream city. What is there?", 
+                      ["Beaches?", "Malls?", "Museums?", "Cinemas?"], 
+                      "In my dream city, there is... and there are many..."),
+            bWrap()
+        ];
+
+        // --- APP ENGINE FUNCTIONS ---
+        let lessonData = generateClassData();
+        let currentStepIdx = 0;
+
+        function startLesson() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('lesson-arena').classList.remove('hidden');
+            document.getElementById('nav-info').classList.remove('hidden');
+            document.querySelector('.lesson-map-btn').classList.remove('hidden');
+            buildLessonNavigator();
+            renderStep();
+        }
+
+        function goHome() {
+            document.getElementById('dashboard').classList.remove('hidden');
+            document.getElementById('lesson-arena').classList.add('hidden');
+            document.getElementById('nav-info').classList.add('hidden');
+            document.querySelector('.lesson-map-btn').classList.add('hidden');
+            currentStepIdx = 0;
+        }
+
+        function buildLessonNavigator() {
+            const list = document.getElementById('nav-steps-list');
+            list.innerHTML = '';
+            lessonData.forEach((step, i) => {
+                const btn = document.createElement('button');
+                btn.className = `nav-item w-full px-4 py-2 text-left text-xs font-bold transition-all ${i === currentStepIdx ? 'active' : 'text-[#b3b3b3] hover:text-white'}`;
+                btn.innerHTML = `<span class="opacity-50 mr-2">${(i+1).toString().padStart(2, '0')}</span> ${step.title.substring(0, 20)}`;
+                btn.onclick = () => { currentStepIdx = i; renderStep(); toggleLessonNavigator(); };
+                list.appendChild(btn);
+            });
+        }
+
+        function renderStep() {
+            const step = lessonData[currentStepIdx];
+            const container = document.getElementById('lesson-content');
+            
+            document.getElementById('step-indicator').innerText = `PAGE ${currentStepIdx + 1} / ${lessonData.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentStepIdx + 1) / lessonData.length) * 100}%`;
+            document.getElementById('teacher-hint').innerHTML = `<i class="fas fa-lightbulb text-yellow-500 mr-2"></i> ${step.teacherHint}`;
+            
+            container.innerHTML = `<div class="w-full animate-in fade-in"><span class="text-[#1DB954] font-black uppercase tracking-[0.3em] text-[10px] block mb-4 text-center">${step.type}</span>${step.html}</div>`;
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach((item, i) => {
+                if(i === currentStepIdx) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerHTML = currentStepIdx === lessonData.length - 1 ? 'FINISH <i class="fas fa-check ml-2"></i>' : 'NEXT <i class="fas fa-arrow-right ml-2"></i>';
+        }
+
+        function nextStep() { if (currentStepIdx < lessonData.length - 1) { currentStepIdx++; renderStep(); } else { goHome(); } }
+        function prevStep() { if (currentStepIdx > 0) { currentStepIdx--; renderStep(); } }
+
+        function handleQuizDrill(id, btn, isCorrect, text, followup, starter) {
+            if(btn.parentElement.classList.contains('locked')) return;
+            if(isCorrect) {
+                const blank = document.getElementById(`quiz-blank-${id}`);
+                if(blank) { blank.innerText = text; blank.classList.remove('border-b-4'); }
+                const parent = btn.parentElement;
+                parent.classList.add('locked');
+                Array.from(parent.children).forEach(child => { 
+                    child.onclick = null; 
+                    child.classList.add('opacity-50', 'cursor-not-allowed'); 
+                });
+                btn.classList.remove('opacity-50'); 
+                btn.classList.add('bg-[#1DB954]', 'text-black', 'border-[#1DB954]');
+                btn.style.transform = 'scale(1.05)'; setTimeout(() => btn.style.transform = 'scale(1)', 200);
+                const fBox = document.getElementById(`followup-box-${id}`);
+                if(fBox) { fBox.classList.remove('hidden'); }
+            } else {
+                btn.classList.add('border-red-500', 'text-red-500');
+                btn.style.transform = 'translateX(-10px)'; 
+                setTimeout(() => btn.style.transform = 'translateX(10px)', 100); 
+                setTimeout(() => btn.style.transform = 'translateX(0)', 200);
+            }
+        }
+
+        function revealScript(element, grammar, meaning, followup, starter) {
+            document.querySelectorAll('.script-line-hl').forEach(el => {
+                el.classList.remove('bg-[#1DB954]', 'text-black');
+                el.classList.add('text-[#1DB954]');
+            });
+            element.classList.add('script-line-hl', 'bg-[#1DB954]', 'text-black');
+            element.classList.remove('text-[#1DB954]');
+            document.getElementById('r-grammar').innerText = grammar;
+            document.getElementById('r-meaning').innerText = meaning;
+            document.getElementById('r-followup').innerText = followup;
+            document.getElementById('r-starter').innerText = `"${starter}"`;
+            const revealBox = document.getElementById('reveal-content');
+            revealBox.classList.remove('hidden');
+            setTimeout(() => revealBox.classList.remove('opacity-0'), 50);
+        }
+
+        function toggleWhiteboard() { document.getElementById('whiteboard').classList.toggle('translate-x-full'); }
+        function toggleLessonNavigator() { document.getElementById('lesson-navigator').classList.toggle('translate-x-full'); }
+        function insertTag(tag) { const text = document.getElementById('wb-text'); text.value += (text.value.length > 0 ? '\n' : '') + tag + ' '; text.focus(); }
+        
+        function toggleFullScreen() {
+            try {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => { console.warn("Error entering fullscreen:", err); });
+                } else {
+                    document.exitFullscreen().catch(err => { console.warn("Error exiting fullscreen:", err); });
+                }
+            } catch (e) { console.warn("Fullscreen API not available."); }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lesson-arena').classList.contains('hidden') === false && document.activeElement.id !== 'wb-text') {
+                if (e.key === 'ArrowRight') nextStep();
+                if (e.key === 'ArrowLeft') prevStep();
+            }
+        });
+    </script>
+</body>
+</html>
